@@ -1,4 +1,5 @@
-import { Sun, Moon } from "lucide-react";
+import { useState } from "react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import type { Category, Theme } from "../../types";
 import { categories } from "../../constants/categories";
 import styles from "./navbar.module.css";
@@ -17,24 +18,38 @@ export const Navbar = ({
   theme,
   onThemeToggle,
 }: NavbarProps) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen((current) => !current);
+  };
+
+  const handleCategoryClick = (category: Category) => {
+    onCategoryChange(category);
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-        <a href="/" className={styles.header}>
-          <img className={styles.logo} src={logo} alt="Logo de ByteFeed" />
-          <h1>ByteFeed</h1>
-        </a>
+        <div className={styles.header}>
+          <a href="/" className={styles.brand}>
+            <img className={styles.logo} src={logo} alt="Logo de ByteFeed" />
+            <h1>ByteFeed</h1>
+          </a>
+        </div>
 
-        <ul className={styles.categories}>
-          {categories.map((category) => (
-            <li
-              key={category.id}
-              className={`${styles.categoryButton} ${activeCategory === category.id ? styles.categoryButtonActive : ""}`}
-              onClick={() => onCategoryChange(category)}
-            >
-              {category.label}
-            </li>
-          ))}
+        <div className={styles.actions}>
+          <button
+            className={styles.menuButton}
+            onClick={handleToggleMenu}
+            aria-expanded={isMenuOpen}
+            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            type="button"
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
           <button
             className={styles.themeToggle}
             onClick={onThemeToggle}
@@ -42,6 +57,18 @@ export const Navbar = ({
           >
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
+        </div>
+
+        <ul className={`${styles.categories} ${isMenuOpen ? styles.open : ""}`}>
+          {categories.map((category) => (
+            <li
+              key={category.id}
+              className={`${styles.categoryButton} ${activeCategory === category.id ? styles.categoryButtonActive : ""}`}
+              onClick={() => handleCategoryClick(category)}
+            >
+              {category.label}
+            </li>
+          ))}
         </ul>
       </div>
     </nav>
